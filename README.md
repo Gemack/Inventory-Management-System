@@ -1,0 +1,1 @@
+An Inventory Management System built using  JavaScript and PHP. React JS which is a JavaScript Frontend framework is used for the UI along side Material UI and React-bootstrap. For the backend Laravel which is a PHP framework is used for the server. MySQL is used for the database
