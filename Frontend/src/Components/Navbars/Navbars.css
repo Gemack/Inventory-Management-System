@@ -1,0 +1,62 @@
+.nav-heading {
+  margin: auto;
+  font-size: 4rem;
+  text-transform: uppercase;
+  color: white;
+}
+.nav-create {
+  margin: auto;
+  font-size: 3rem;
+  text-transform: uppercase;
+  color: white;
+  text-align: center;
+  width: 80%;
+}
+.nav-img {
+  border-radius: 4rem;
+}
+
+.label-main {
+  margin-top: 3rem;
+}
+
+.label-select {
+  font-size: 1.5rem;
+  width: 100%;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.label-select label {
+  margin-right: 2rem;
+}
+
+.label-select select {
+  border: blue;
+}
+
+.goods-in-out {
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.button-div {
+  width: 80%;
+  margin: auto;
+}
+
+.link-home {
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  text-decoration: none;
+  transition: all 2s;
+  width: 10%;
+  margin: auto;
+}
+
+.link-home:hover {
+  color: black;
+}
