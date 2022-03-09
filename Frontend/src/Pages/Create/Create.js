@@ -126,15 +126,15 @@ const Create = () => {
       [e.target.name]: e.target.value,
     }));
   };
-  //  This Function fetch data from the database
+  //  ============================ This Function fetch data from the database ===================
   const getApiData = async () => {
     setLoading(true);
     const product = await axios.get("http://localhost:8000/api/products");
     setData(product.data);
     setLoading(false);
-    // return data;
   };
 
+  // ==============================================================================================
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -143,12 +143,13 @@ const Create = () => {
     setOpen(false);
   };
 
-  //  This function delete entry from the database
+  //  =================================== This function delete entry from the database ==============
 
+  // get id of to be deleted item
   const getDel = (id) => {
     setDel(id);
-    console.log(del);
   };
+  // ================
   const deleteProduct = async () => {
     const response = await axios.delete(
       `http://localhost:8000/api/products/${del.id}`
@@ -158,16 +159,18 @@ const Create = () => {
       toast.success("Entry Deleted");
     }
   };
-
+  // ==================================================================================================================
   useEffect(() => {
     getApiData();
   }, []);
 
+  //  ============ This function update entery in the Database ========================================================
+  // get id of to be updated item
   const getId = (id) => {
     setFile(id);
     handleDrawerOpen();
   };
-
+  // ===================
   const submit = async (e) => {
     e.preventDefault();
     try {
@@ -179,11 +182,11 @@ const Create = () => {
       setFormData({ Product: "", Gin: "", Gout: "" });
       toast.success("Data Updated");
     } catch (error) {
-      console.log(error);
+      return null;
     }
     getApiData();
   };
-
+  // =================================================================================================
   return (
     <div>
       <CreateNavbar api={getApiData} />
@@ -222,7 +225,7 @@ const Create = () => {
           </DialogActions>
         </Dialog>
       </div>
-
+      {/* ============================================================================================================== */}
       <Drawer
         className={classes.drawer}
         variant="persistent"

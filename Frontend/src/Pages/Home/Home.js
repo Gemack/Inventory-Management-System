@@ -24,7 +24,6 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
 
 const Home = ({ auth }) => {
   const [data, setData] = useState([]);
@@ -39,6 +38,7 @@ const Home = ({ auth }) => {
     setOpen(false);
   };
 
+  // ========================== This function get data from the server ==================================
   const getData = async () => {
     try {
       const product = await axios.get("http://localhost:8000/api/all");
@@ -48,10 +48,13 @@ const Home = ({ auth }) => {
     }
   };
 
+  // ======================================================================================================
   useEffect(() => {
     getData();
   }, []);
 
+  // ==== This Function dynamically render text in the status columnn in the home page table based
+  //  on the number of goods available ==============================
   const status = (x) => {
     if (x > 70) {
       return "Good";
@@ -63,6 +66,11 @@ const Home = ({ auth }) => {
       return "Debt Danger";
     }
   };
+
+  // ==========================================================================================================
+
+  // ==== This Function dynamically render background color in the status columnn in the home page table based
+  //  on the number of goods available ==============================
   const statusStyle = (x) => {
     if (x > 70) {
       return "lime";
@@ -81,13 +89,16 @@ const Home = ({ auth }) => {
     setKey(e.target.value);
   };
 
+  // =================================== Logging Function=====================================
   const submit = async () => {
     const file = { username: "Admin", key: key };
     try {
       await axios.post("http://localhost:8000/api/log", file);
       toast.success("Correct Password");
       setKey("");
+      //======================== pass from the parent to render the user state in the parent
       auth();
+      // =====================================================
       handleClose();
       navigate("/create");
     } catch (error) {
@@ -125,20 +136,16 @@ const Home = ({ auth }) => {
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button
-              // onClick={handleClose}
-              onClick={submit}
-              color="primary"
-            >
+            <Button onClick={submit} color="primary">
               Log in
             </Button>
           </DialogActions>
         </Dialog>
       </div>
-
-      {/*  */}
+      {/*============================================================================================================== */}
       <HomeNavbar />
-      <Showcase data={data} />
+      <Showcase data={data} />{" "}
+      {/* The data passed here will be passed to the carosel for displaying slide */}
       <Container className="home_md">
         <Tooltip
           title="Add and keep record of your inventories"
@@ -151,7 +158,6 @@ const Home = ({ auth }) => {
         </Tooltip>
       </Container>
       <hr style={{ color: "white" }} />
-
       <TableContainer className="home-table">
         <Table striped bordered hover variant="dark">
           <TableHead style={{ background: "blue" }}>

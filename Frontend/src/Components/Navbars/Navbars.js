@@ -38,7 +38,7 @@ export const HomeNavbar = () => {
   );
 };
 
-// This Navbar his for the second page
+// Create Page Navbar
 const drawerWidth = 540;
 
 const useStyles = makeStyles((theme) => ({
@@ -113,7 +113,7 @@ export const CreateNavbar = ({ api }) => {
     }));
   };
 
-  // This function Post data into the database
+  // ================================== This function Post data into the database ==========================
   const submit = async (e) => {
     e.preventDefault();
     try {
@@ -128,6 +128,7 @@ export const CreateNavbar = ({ api }) => {
     }
   };
 
+  // ==============================================================================
   const handleDrawerOpen = () => {
     setOpen(true);
   };
