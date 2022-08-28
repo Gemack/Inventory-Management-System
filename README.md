@@ -1,6 +1,7 @@
 # INVENTORY MANAGEMENT SYSTEM
 
-(image)
+
+![Screenshot (119)](https://user-images.githubusercontent.com/76667791/187096636-be55c7b3-8197-4502-bdd1-f38c667e10ec.png)
 
 An Inventory Management System built using  JavaScript and Python.
 The Frontend (UI) logic is handled by ReactJS(JavaScript) While the Backend Logic is handle by 
