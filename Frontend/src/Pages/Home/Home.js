@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./Home.css";
 import { Container } from "react-bootstrap";
 import { HomeNavbar } from "../../Components/Navbars/Navbars";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
+import { AiOutlineFileProtect, AiOutlineLogin } from "react-icons/ai";
+import { BiLogOutCircle } from "react-icons/bi";
 import Showcase from "../../Components/Showcase/Showcase";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Button,
   TextField,
@@ -24,11 +19,14 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
-const Home = ({ auth }) => {
+const Home = ({ login, user, logout }) => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const [product, setProduct] = useState([]);
+  const [token, setToken] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -38,50 +36,30 @@ const Home = ({ auth }) => {
     setOpen(false);
   };
 
+  // console.log(user);
+  // ============================== This Function get all Product from the database ====================
+  const getProducts = async () => {
+    try {
+      const product = await axios.get(
+        "http://127.0.0.1:8000/api/product-detail"
+      );
+      setProduct(product.data);
+    } catch {}
+  };
+
   // ========================== This function get data from the server ==================================
   const getData = async () => {
     try {
-      const product = await axios.get("http://localhost:8000/api/all");
+      const product = await axios.get("http://127.0.0.1:8000/api/latest_inv");
       setData(product.data);
-    } catch {
-      console.log("Error");
-    }
+    } catch {}
   };
 
   // ======================================================================================================
   useEffect(() => {
     getData();
+    getProducts();
   }, []);
-
-  // ==== This Function dynamically render text in the status columnn in the home page table based
-  //  on the number of goods available ==============================
-  const status = (x) => {
-    if (x > 70) {
-      return "Good";
-    } else if (x <= 69 && x >= 40) {
-      return "Fair";
-    } else if (x <= 39 && x >= 0) {
-      return "Bad";
-    } else {
-      return "Debt Danger";
-    }
-  };
-
-  // ==========================================================================================================
-
-  // ==== This Function dynamically render background color in the status columnn in the home page table based
-  //  on the number of goods available ==============================
-  const statusStyle = (x) => {
-    if (x > 70) {
-      return "lime";
-    } else if (x <= 69 && x >= 40) {
-      return "yellow";
-    } else if (x <= 39 && x >= 0) {
-      return "red";
-    } else {
-      return "red";
-    }
-  };
 
   const [key, setKey] = useState("");
 
@@ -89,21 +67,36 @@ const Home = ({ auth }) => {
     setKey(e.target.value);
   };
 
+  // Nicely format the Product price
+  const numberWithCommas = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   // =================================== Logging Function=====================================
   const submit = async () => {
-    const file = { username: "Admin", key: key };
+    const file = { username: "emack", password: key };
     try {
-      await axios.post("http://localhost:8000/api/log", file);
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/token/",
+        file
+      );
       toast.success("Correct Password");
       setKey("");
       //======================== pass from the parent to render the user state in the parent
-      auth();
+      login();
       // =====================================================
       handleClose();
-      navigate("/create");
+      // navigate("/create");
+      console.log(response.data);
+      localStorage.setItem("token", JSON.stringify(response.data));
     } catch (error) {
       toast.error("Wrong Password");
     }
+  };
+
+  const logoutuser = () => {
+    logout();
+    localStorage.removeItem("token");
   };
 
   return (
@@ -118,13 +111,12 @@ const Home = ({ auth }) => {
           <DialogTitle id="form-dialog-title">Login</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              To Manage Inventory you must be authenticated please provide
-              password
+              To Manage Inventory and product you must be authenticated please
+              provide password
             </DialogContentText>
             <TextField
               autoFocus
               margin="dense"
-              id="name"
               label="Login Password"
               type="password"
               fullWidth
@@ -147,46 +139,71 @@ const Home = ({ auth }) => {
       <Showcase data={data} />{" "}
       {/* The data passed here will be passed to the carosel for displaying slide */}
       <Container className="home_md">
-        <Tooltip
-          title="Add and keep record of your inventories"
-          placement="top-start"
-        >
-          <div className="manage" onClick={handleClickOpen}>
-            <BsFillJournalBookmarkFill size={40} color="white" />
-            <span>Manage Inventory</span>
+        {user ? (
+          <div className="manage">
+            <Tooltip
+              title="Add and keep record of your inventories"
+              placement="top-start"
+            >
+              <div className="inventory">
+                <Link to="/create" style={{ textDecoration: "none" }}>
+                  <BsFillJournalBookmarkFill size={40} color="white" />
+                  <span>Manage Inventory</span>
+                </Link>
+              </div>
+            </Tooltip>
+            <button className="logout" onClick={() => logoutuser()}>
+              <BiLogOutCircle />
+              LOGOUT
+            </button>
+            <Tooltip
+              title="Add new product to your inventories"
+              placement="top-start"
+            >
+              <div className="product">
+                <Link to="/product" style={{ textDecoration: "none" }}>
+                  <AiOutlineFileProtect size={40} color="white" />
+                  <span>Manage Products</span>
+                </Link>
+              </div>
+            </Tooltip>
           </div>
-        </Tooltip>
+        ) : (
+          <button className="login" onClick={handleClickOpen}>
+            <AiOutlineLogin />
+            LOGIN
+          </button>
+        )}
       </Container>
-      <hr style={{ color: "white" }} />
-      <TableContainer className="home-table">
-        <Table striped bordered hover variant="dark">
-          <TableHead style={{ background: "blue" }}>
-            <TableRow>
-              <TableCell className="Table-head">Name of Product</TableCell>
-              <TableCell className="Table-head">Purchased</TableCell>
-              <TableCell className="Table-head">Sold</TableCell>
-              <TableCell className="Table-head">Available</TableCell>
-              <TableCell className="Table-head">Status</TableCell>
-            </TableRow>
-          </TableHead>
-          {data?.map((d) => (
-            <TableBody key={uuidv4()}>
-              <TableRow>
-                <TableCell className="Table-body">{d.name}</TableCell>
-                <TableCell className="Table-body">{d.in}</TableCell>
-                <TableCell className="Table-body">{d.out}</TableCell>
-                <TableCell className="Table-body">{d.sum}</TableCell>
-                <TableCell
-                  className="Table-body"
-                  style={{ background: statusStyle(d.sum) }}
-                >
-                  {status(d.sum)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          ))}
-        </Table>
-      </TableContainer>
+      <h3 style={{ textAlign: "center", color: "blue" }}>
+        ALL AVAILABLE PRODUCTS
+      </h3>
+      <Container className="Products-container">
+        {product.map((p) => (
+          <Link to={`/detail/${p.id}`} className="product-box">
+            <Tooltip
+              title="You Need to be logged in to view product details and transactions"
+              placement="top-start"
+            >
+              <div>
+                <div>
+                  <h4>Product Name</h4> <span>{p.name}</span>
+                </div>
+                <hr />
+                <h4>
+                  Product Price:{" "}
+                  <span>
+                    <span>&#8358;</span>
+                    {numberWithCommas(p.price)}
+                  </span>
+                </h4>
+                <hr />
+                <p>{p.description}</p>
+              </div>
+            </Tooltip>
+          </Link>
+        ))}
+      </Container>
     </div>
   );
 };

@@ -1,0 +1,58 @@
+.Detail-head {
+  margin: 1rem auto;
+  display: flex;
+  width: 95%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.operations {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 13%;
+  border-radius: 10px;
+}
+
+.delete {
+  background: red;
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.client-body {
+  width: 95%;
+  margin: auto;
+}
+
+.All-entry {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  color: blue;
+}
+
+.more-info {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 1.5rem;
+  color: blue;
+}
+.no-entry {
+  text-align: center;
+  margin: 3rem 0;
+  text-transform: uppercase;
+  font-size: 2rem;
+  color: red;
+}
+
+.backLink {
+  color: blue;
+  text-decoration: none;
+  transition: all 1.1s;
+}
+
+.backLink:hover {
+  color: rgb(2, 2, 68);
+}

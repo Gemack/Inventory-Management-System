@@ -1,0 +1,20 @@
+.AddLink {
+  font-size: 1.3rem;
+  background: blue;
+  padding: 0.1rem;
+  width: 12rem;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 1.3s;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+}
+
+.AddLink:hover {
+  background: rgb(2, 2, 75);
+  color: white;
+}

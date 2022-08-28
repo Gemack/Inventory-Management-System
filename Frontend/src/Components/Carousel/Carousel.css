@@ -1,5 +1,10 @@
-.carousel {
-  height: 50%;
-  display: flex;
-  align-items: "center";
+.latest {
+  color: white;
+  font-size: 0.8rem;
+}
+
+.latestName {
+  color: whitesmoke;
+  font-size: 0.7rem;
+  font-style: italic;
 }

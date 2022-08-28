@@ -1,6 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import axios from "axios";
 import "./Create.css";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import img from "./inventory 2.jpg";
 import { CreateNavbar } from "../../Components/Navbars/Navbars";
@@ -102,12 +103,14 @@ const Create = () => {
   const classes = useStyles();
   const theme = useTheme();
   const [data, setData] = useState([]);
+  const [invPro, setinvPro] = useState([]);
   const [file, setFile] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [open1, setOpen1] = useState(false);
   const [del, setDel] = useState([]);
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
     setOpen1(true);
@@ -117,24 +120,56 @@ const Create = () => {
     setOpen1(false);
   };
 
-  const [formData, setFormData] = useState({ Product: "", Gin: "", Gout: "" });
-
-  const { Product, Gin, Gout } = formData;
+  const [formData, setFormData] = useState({
+    product: "",
+    sold: "",
+    purchased: "",
+  });
   const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
+
+  const token = JSON.parse(localStorage.getItem("token"));
+
   //  ============================ This Function fetch data from the database ===================
   const getApiData = async () => {
     setLoading(true);
-    const product = await axios.get("http://localhost:8000/api/products");
+    const product = await axios.get("http://127.0.0.1:8000/api/all_inv", {
+      headers: {
+        Authorization: "Bearer " + token.access,
+      },
+    });
     setData(product.data);
     setLoading(false);
   };
 
   // ==============================================================================================
+
+  //  This function get all available products
+  const getProducts = async () => {
+    try {
+      const invProduct = await axios.get("http://127.0.0.1:8000/api/", {
+        headers: {
+          Authorization: "Bearer " + token.access,
+        },
+      });
+      if (invProduct.status === 401) {
+        localStorage.removeItem("user");
+      }
+      setinvPro(invProduct.data);
+    } catch (err) {
+      navigate("/");
+      toast.error(
+        "Access Token to this session as expired please refresh and login "
+      );
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  };
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -150,11 +185,17 @@ const Create = () => {
     setDel(id);
   };
   // ================
+  // 2
   const deleteProduct = async () => {
     const response = await axios.delete(
-      `http://localhost:8000/api/products/${del.id}`
+      `http://127.0.0.1:8000/api/delete-inv/${del.id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token.access,
+        },
+      }
     );
-    if (response.status === 200) {
+    if (response.status === 204) {
       getApiData();
       toast.success("Entry Deleted");
     }
@@ -162,6 +203,7 @@ const Create = () => {
   // ==================================================================================================================
   useEffect(() => {
     getApiData();
+    getProducts();
   }, []);
 
   //  ============ This function update entery in the Database ========================================================
@@ -171,21 +213,39 @@ const Create = () => {
     handleDrawerOpen();
   };
   // ===================
+
+  //
+
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
-        `http://localhost:8000/api/products/${file.id}`,
-        formData
+      const respons = await axios.post(
+        `http://127.0.0.1:8000/api/update-inv/${file.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: "Bearer " + token.access,
+          },
+        }
       );
       setOpen(false);
-      setFormData({ Product: "", Gin: "", Gout: "" });
-      toast.success("Data Updated");
+      if (respons.status === 200) {
+        toast.success("Data Updated");
+        setFormData({
+          product: "",
+          sold: "",
+          purchased: "",
+        });
+      } else {
+        toast.warning("Empty Entry Data No Updated");
+      }
     } catch (error) {
       return null;
     }
     getApiData();
   };
+
+  useEffect(() => {});
   // =================================================================================================
   return (
     <div>
@@ -252,23 +312,18 @@ const Create = () => {
           <div className="label-main">
             <div className="label-select">
               <label htmlFor="name">Product</label>
+
               <select
                 onChange={onChange}
-                name="Product"
-                id="name"
-                value={Product}
+                name="product"
+                value={formData.product}
               >
                 <option></option>
-                <option>Power Generator</option>
-                <option> Thermocool Refrigerator</option>
-                <option>Thermocool Air Conditional</option>
-                <option>Solar Panel</option>
-                <option>Smart Tv set</option>
-                <option>Sony Sound System</option>
-                <option>Thermocool Standing fan</option>
-                <option>Fan</option>
-                <option>DSTV Decoder</option>
-                <option>Sony Playstation</option>
+                {invPro.map((inv) => (
+                  <option value={inv.pk} key={inv.pk}>
+                    {inv.name}
+                  </option>
+                ))}
               </select>
             </div>
             <Divider />
@@ -276,10 +331,9 @@ const Create = () => {
               <InputLabel htmlFor="goods-in">Goods in</InputLabel>
               <Input
                 style={{ width: "100% " }}
-                value={Gin}
+                value={formData.purchased}
                 onChange={onChange}
-                name="Gin"
-                id="Gin"
+                name="purchased"
                 type="number"
                 inputProps={{ min: "0" }}
               />
@@ -288,10 +342,9 @@ const Create = () => {
             <div className="goods-in-out">
               <InputLabel htmlFor="goods-out">Goods Out</InputLabel>
               <Input
-                value={Gout}
-                name="Gout"
+                value={formData.sold}
+                name="sold"
                 onChange={onChange}
-                id="Gout"
                 type="number"
                 inputProps={{ min: "0" }}
                 style={{ width: "100% " }}
@@ -338,9 +391,9 @@ const Create = () => {
               {data.slice((page - 1) * 10, (page - 1) * 10 + 10).map((p) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
-                  <td>{p.Product}</td>
-                  <td>{p.Gin}</td>
-                  <td>{p.Gout}</td>
+                  <td>{p.product}</td>
+                  <td>{p.sold}</td>
+                  <td>{p.purchased}</td>
                   <td>
                     <div
                       style={{

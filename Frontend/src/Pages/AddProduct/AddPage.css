@@ -1,0 +1,24 @@
+.AddPage {
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.AddPage h2 {
+  text-transform: capitalize;
+  color: blue;
+  font-size: 2.4rem;
+}
+
+.AddPage form {
+  width: 70%;
+  text-align: center;
+  height: 90%;
+}
+
+.addinput {
+  margin: 2rem;
+}

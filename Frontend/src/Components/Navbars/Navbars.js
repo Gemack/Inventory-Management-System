@@ -2,7 +2,7 @@ import { Navbar, Container } from "react-bootstrap";
 import "./Navbars.css";
 
 // NAVBAR 2
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -102,10 +102,12 @@ export const CreateNavbar = ({ api }) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-
-  const [formData, setFormData] = useState({ Product: "", Gin: "", Gout: "" });
-
-  const { Product, Gin, Gout } = formData;
+  const [invPro, setinvPro] = useState([]);
+  const [formData, setFormData] = useState({
+    product: "",
+    sold: "",
+    purchased: "",
+  });
   const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -113,20 +115,45 @@ export const CreateNavbar = ({ api }) => {
     }));
   };
 
+  //  This function get all available products
+  const token = JSON.parse(localStorage.getItem("token"));
+  const getProducts = async () => {
+    const invProduct = await axios.get("http://127.0.0.1:8000/api/", {
+      headers: {
+        Authorization: "Bearer " + token.access,
+      },
+    });
+    setinvPro(invProduct.data);
+  };
+
   // ================================== This function Post data into the database ==========================
   const submit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
-      await axios.post("http://localhost:8000/api/products", formData);
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/create-inv",
+        formData,
+        {
+          headers: {
+            Authorization: "Bearer " + token.access,
+          },
+        }
+      );
       api();
       setOpen(false);
+      console.log(res.status);
       toast.success("Entry Successful");
-      setFormData({ Product: "", Gin: "", Gout: "" });
+      setFormData({ product: "", sold: "", purchased: "" });
     } catch (error) {
       console.log(error);
       toast.error("Data entry missing");
     }
   };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   // ==============================================================================
   const handleDrawerOpen = () => {
@@ -207,21 +234,15 @@ export const CreateNavbar = ({ api }) => {
               <label htmlFor="name">Product</label>
               <select
                 onChange={onChange}
-                name="Product"
-                id="name"
-                value={Product}
+                name="product"
+                value={formData.product}
               >
                 <option></option>
-                <option>Power Generator</option>
-                <option> Thermocool Refrigerator</option>
-                <option>Thermocool Air Conditional</option>
-                <option>Solar Panel</option>
-                <option>Smart Tv set</option>
-                <option>Sony Sound System</option>
-                <option>Thermocool Standing fan</option>
-                <option>Fan</option>
-                <option>DSTV Decoder</option>
-                <option>Sony Playstation</option>
+                {invPro.map((inv) => (
+                  <option value={inv.pk} key={inv.pk}>
+                    {inv.name}
+                  </option>
+                ))}
               </select>
             </div>
             <Divider />
@@ -229,10 +250,9 @@ export const CreateNavbar = ({ api }) => {
               <InputLabel htmlFor="goods-in">Goods in</InputLabel>
               <Input
                 style={{ width: "100% " }}
-                value={Gin}
+                value={formData.purchased}
                 onChange={onChange}
-                name="Gin"
-                id="Gin"
+                name="purchased"
                 type="number"
                 inputProps={{ min: "0" }}
               />
@@ -241,10 +261,9 @@ export const CreateNavbar = ({ api }) => {
             <div className="goods-in-out">
               <InputLabel htmlFor="goods-out">Goods Out</InputLabel>
               <Input
-                value={Gout}
-                name="Gout"
+                value={formData.sold}
+                name="sold"
                 onChange={onChange}
-                id="Gout"
                 type="number"
                 inputProps={{ min: "0" }}
                 style={{ width: "100% " }}
