@@ -15,10 +15,14 @@ This Web application is a Full CRUD that allow user to create a product and keep
 related to that product in the inventory. 
 
 Some important JavaScripts libaries used for the frontend include
--- React-bootstrap, - Materia UI, - toasty and - react-router-dom
+- React-bootstrap,
+- Materia UI, 
+- toasty and 
+- react-router-dom
 
 while for the backend along Django rest framework
--django-cors-headers, -django and -JWT.
+- django-cors-headers,
+- django and -JWT.
 
 ## TO USE
 after cloning or downloading
